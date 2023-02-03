@@ -1,0 +1,6 @@
+*.*
+!.gitignore
+!*.txt
+!*.md
+!*.py
+never_share.py

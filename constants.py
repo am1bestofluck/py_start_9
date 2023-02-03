@@ -1,0 +1,2 @@
+BASKET = 211
+MAX_TURN = 19
