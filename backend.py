@@ -1,4 +1,5 @@
 """здесь вся магия"""
+from collections import defaultdict
 import telegram
 import sys
 
@@ -9,8 +10,9 @@ except ImportError:
     print('pip install python-telegram-bot --upgrade')
     sys.exit()
 
+from constants import BASKET, MAX_TURN
 
-sessions = {}
+sessions = defaultdict(lambda:  None)
 import asyncio # :(
 import webbrowser
 
@@ -48,6 +50,7 @@ async def new_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     "You can have on of them.", "The last one! That is, if You are shrewd.",
     "\n\t", "Rules are simple!", "One to grab the last candy, keeps it!",
     "Real nice candy, I can tell! Hf."]))
+    sessions[update.effective_user.id] = BASKET
     
 async def move (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("int expected")
