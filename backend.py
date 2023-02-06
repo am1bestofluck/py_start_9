@@ -1,5 +1,7 @@
 """здесь вся магия"""
 from collections import defaultdict
+import random
+import re
 import telegram
 import sys
 
@@ -10,7 +12,7 @@ except ImportError:
     print('pip install python-telegram-bot --upgrade')
     sys.exit()
 
-from constants import BASKET, MAX_TURN
+from constants import BASKET, MAX_TURN, RESULT
 
 sessions = defaultdict(lambda:  None)
 import asyncio # :(
@@ -43,19 +45,41 @@ async def help_(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Ok!')
+    sessions[update.effective_user.id] = BASKET
 
-async def new_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(' '.join(['Hello! We start again!\n\t',
+async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(' '.join(['Hello!\n\t',
     "Imagine basket, full of candies.\n",
     "You can have on of them.", "The last one! That is, if You are shrewd.",
-    "\n\t", "Rules are simple!", "One to grab the last candy, keeps it!",
+    "\n\t", "Rules are simple!",f"Can take up to {str(MAX_TURN)} candies. ", "One to grab the last candy, keeps it!",
     "Real nice candy, I can tell! Hf."]))
     sessions[update.effective_user.id] = BASKET
-    
-async def move (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("int expected")
 
-    
+async def notation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text('\n'.join(["/start - info","/reset - retry",
+    "/rules - rules", "/take <int> - take candy(-ies)"]))
+
+async def move_bot(update_: Update, context: ContextTypes.DEFAULT_TYPE, killer:bool=False):
+    if killer:
+        pass # acts to win
+    else:
+        sessions[update_.effective_user.id] - random.choice(range(MAX_TURN+1)) 
+
+
+async def move (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text(f"between 0 and {str(MAX_TURN)} expected!")
+
+    if sessions[update.effective_user.id> 0:]
+        move_bot(update_=update,killer=False)
+    if sessions[update.effective_user.id] < 1:
+        print(RESULT[True])
+
 
 # async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 #     await update.message.reply_text(f'Hello {update.effective_user.first_name}')
+
+
+def parse_msg(update, context):
+    if re.search("^(/take) \d+$", update.message.text, re.IGNORECASE | re.DOTALL):
+        
+       update.message.reply_text("send your content")
