@@ -21,7 +21,7 @@ except ImportError:
     print("токен придётся взять свой :( :)")
     sys.exit()
 
-from backend import reset, rules, help_, move, notation
+from backend import reset, rules, move, notation
 from constants import MAX_TURN
 
 
