@@ -14,7 +14,7 @@ except ImportError:
     print('pip install python-telegram-bot --upgrade')
     sys.exit()
 
-from constants import BASKET, MAX_TURN, RESULT
+from constants import BASKET, MAX_TURN, RESULT,DIFFICULTY
 
 sessions = defaultdict(lambda:  BASKET)
 
@@ -97,8 +97,7 @@ async def move (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if sessions[update.effective_user.id] <= 0:
         await update.message.reply_text(f"{RESULT[True]}")
     else :
-        
         if sessions[update.effective_user.id] > 0:
             await move_bot(update_=update,context=context,killer=
-            True)
+            random.choice([DIFFICULTY]))
     

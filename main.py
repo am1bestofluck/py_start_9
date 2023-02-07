@@ -33,4 +33,3 @@ app.add_handler(CommandHandler("rules", rules))
 for i in range(MAX_TURN+1):
     app.add_handler(CommandHandler(f"take{str(i)}",move))
 app.run_polling()
-
