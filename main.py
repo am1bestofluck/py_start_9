@@ -18,7 +18,8 @@ except ImportError:
 try:
     from never_share import BOT_KEY
 except ImportError:
-    print("токен придётся взять свой :( :)")
+    print("токен придётся взять свой :( :)"+\
+        "\nДолжен лежать в never_share.py c именем BOT_KEY")
     sys.exit()
 
 from backend import reset, rules, move, notation
