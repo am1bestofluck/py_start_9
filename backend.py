@@ -24,7 +24,7 @@ async def help_(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f'Ok!')
+    await update.message.reply_text(f'Ok! {str(BASKET)} candies now.')
     sessions[update.effective_user.id] = BASKET
 
 
@@ -52,15 +52,14 @@ async def move_bot(update_: Update, context: ContextTypes.DEFAULT_TYPE, killer:b
         return
     if killer:
         await asyncio.sleep(0.00001)
-        if not sessions[update_.effective_user.id]%MAX_TURN:
+        if sessions[update_.effective_user.id] <= MAX_TURN:
+            pick = MAX_TURN
+        elif sessions[update_.effective_user.id]%MAX_TURN == 0:
             pick = MAX_TURN-1
+        elif sessions[update_.effective_user.id]%MAX_TURN !=1:
+            pick = sessions[update_.effective_user.id]%MAX_TURN -1 
         else:
-            await asyncio.sleep(0.00001)
-            pick = sessions[update_.effective_user.id]%MAX_TURN -1 if \
-                sessions[update_.effective_user.id]> MAX_TURN else\
-                sessions[update_.effective_user.id]
-        pick = 1 if pick == 0 else pick
-        pick = 19 if pick 
+            pick = random.choice(range(1,MAX_TURN+1))# если уже нет победных ходов           
     else:
         await asyncio.sleep(0.00001)
         pick = random.choice(range(1,MAX_TURN+1))
@@ -69,7 +68,7 @@ async def move_bot(update_: Update, context: ContextTypes.DEFAULT_TYPE, killer:b
     prompt = f"Bot took {str(pick)} candies.\n"+\
         f"{str(sessions[update_.effective_user.id])} left!" if\
         sessions[update_.effective_user.id] > 0 else\
-            "Bot took all of 'em!"
+            "Bot keeps the candy!"
     await update_.message.reply_text(prompt)
     if sessions[update_.effective_user.id] <= 0:
         await update_.message.reply_text(f"{RESULT[False]}")
@@ -93,7 +92,7 @@ async def move (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     sessions[update.effective_user.id] -= take
     prompt = f'{str(sessions[update.effective_user.id])} left!' if\
         sessions[update.effective_user.id] > 0 else\
-            "You took all of 'em!"
+            "You got it!"
     await update.message.reply_text(prompt)
     if sessions[update.effective_user.id] <= 0:
         await update.message.reply_text(f"{RESULT[True]}")

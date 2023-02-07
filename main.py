@@ -1,6 +1,5 @@
 
 
-import re
 import sys
 
 
@@ -11,8 +10,7 @@ if telegram.__version__ !='20.0':
 
 try:
     from telegram import Update
-    from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes,\
-        MessageHandler, filters, Updater
+    from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 except ImportError:
     print('pip install python-telegram-bot --upgrade')
     sys.exit()
