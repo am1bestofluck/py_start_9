@@ -1,6 +1,7 @@
 """здесь вся магия"""
 import asyncio
 from collections import defaultdict
+import math
 import random
 import re
 import telegram
@@ -46,14 +47,25 @@ async def notation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def move_bot(update_: Update, context: ContextTypes.DEFAULT_TYPE, killer:bool=False):
     await asyncio.sleep(0.00001)
-    if sessions[update_.effective_user.id] < 0:
+    # print(killer)
+    if sessions[update_.effective_user.id] <= 0:
         return
     if killer:
-         pick = random.choice(range(1,MAX_TURN+1)) # acts to win
+        await asyncio.sleep(0.00001)
+        if not sessions[update_.effective_user.id]%MAX_TURN:
+            pick = MAX_TURN-1
+        else:
+            await asyncio.sleep(0.00001)
+            pick = sessions[update_.effective_user.id]%MAX_TURN -1 if \
+                sessions[update_.effective_user.id]> MAX_TURN else\
+                sessions[update_.effective_user.id]
+        pick = 1 if pick == 0 else pick
+        pick = 19 if pick 
     else:
+        await asyncio.sleep(0.00001)
         pick = random.choice(range(1,MAX_TURN+1))
 
-        sessions[update_.effective_user.id] -= pick
+    sessions[update_.effective_user.id] -= pick
     prompt = f"Bot took {str(pick)} candies.\n"+\
         f"{str(sessions[update_.effective_user.id])} left!" if\
         sessions[update_.effective_user.id] > 0 else\
@@ -65,7 +77,7 @@ async def move_bot(update_: Update, context: ContextTypes.DEFAULT_TYPE, killer:b
 
 async def move (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await asyncio.sleep(0.00001)
-    if sessions[update.effective_user.id] < 0:
+    if sessions[update.effective_user.id] <= 0:
         return
     digits_mask = re.compile("\d+")
     try:
@@ -77,6 +89,7 @@ async def move (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text(
             f"between {str(min(borders))} and {str(MAX_TURN)} expected!")
         return
+    await asyncio.sleep(0.001)
     sessions[update.effective_user.id] -= take
     prompt = f'{str(sessions[update.effective_user.id])} left!' if\
         sessions[update.effective_user.id] > 0 else\
@@ -87,5 +100,6 @@ async def move (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else :
         
         if sessions[update.effective_user.id] > 0:
-            await move_bot(update_=update,context=context,killer=False)
+            await move_bot(update_=update,context=context,killer=
+            True)
     
