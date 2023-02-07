@@ -7,4 +7,4 @@ DIFFICULTY = []
 for i in range(seed):
     DIFFICULTY.append(True)
 for i in range(100 - seed):
-    DIFFICULTY.append(True)
+    DIFFICULTY.append(False)
