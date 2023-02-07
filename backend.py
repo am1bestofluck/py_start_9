@@ -1,4 +1,5 @@
 """здесь вся магия"""
+import asyncio
 from collections import defaultdict
 import random
 import re
@@ -14,29 +15,7 @@ except ImportError:
 
 from constants import BASKET, MAX_TURN, RESULT
 
-sessions = defaultdict(lambda:  None)
-import asyncio # :(
-import webbrowser
-
-class Game():
-    
-    def __init__(self,user:Update):
-        self.user = user.effective_user.id
-    
-    async def flow_fork(self):
-        return
-    
-    async def flow_easy(self):
-        return
-    
-    async def flow_hard(self):
-        return
-
-    async def result(self):
-        if True:
-            return
-        return
-
+sessions = defaultdict(lambda:  BASKET)
 
 async def help_(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('\n'.join(['/start: help',
@@ -47,6 +26,8 @@ async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(f'Ok!')
     sessions[update.effective_user.id] = BASKET
 
+
+
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(' '.join(['Hello!\n\t',
     "Imagine basket, full of candies.\n",
@@ -55,31 +36,56 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     "Real nice candy, I can tell! Hf."]))
     sessions[update.effective_user.id] = BASKET
 
+
+
 async def notation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text('\n'.join(["/start - info","/reset - retry",
-    "/rules - rules", "/take <int> - take candy(-ies)"]))
+    "/rules - rules", "/take<int>, as in /take1 or /take19 - take candy(-ies)"]))
+
+
 
 async def move_bot(update_: Update, context: ContextTypes.DEFAULT_TYPE, killer:bool=False):
+    await asyncio.sleep(0.00001)
+    if sessions[update_.effective_user.id] < 0:
+        return
     if killer:
-        pass # acts to win
+         pick = random.choice(range(1,MAX_TURN+1)) # acts to win
     else:
-        sessions[update_.effective_user.id] - random.choice(range(MAX_TURN+1)) 
+        pick = random.choice(range(1,MAX_TURN+1))
+
+        sessions[update_.effective_user.id] -= pick
+    prompt = f"Bot took {str(pick)} candies.\n"+\
+        f"{str(sessions[update_.effective_user.id])} left!" if\
+        sessions[update_.effective_user.id] > 0 else\
+            "Bot took all of 'em!"
+    await update_.message.reply_text(prompt)
+    if sessions[update_.effective_user.id] <= 0:
+        await update_.message.reply_text(f"{RESULT[False]}")
 
 
 async def move (update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(f"between 0 and {str(MAX_TURN)} expected!")
-
-    if sessions[update.effective_user.id> 0:]
-        move_bot(update_=update,killer=False)
-    if sessions[update.effective_user.id] < 1:
-        print(RESULT[True])
-
-
-# async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-#     await update.message.reply_text(f'Hello {update.effective_user.first_name}')
-
-
-def parse_msg(update, context):
-    if re.search("^(/take) \d+$", update.message.text, re.IGNORECASE | re.DOTALL):
+    await asyncio.sleep(0.00001)
+    if sessions[update.effective_user.id] < 0:
+        return
+    digits_mask = re.compile("\d+")
+    try:
+        take = int(re.findall(digits_mask,update.message['text'])[0])
+    except TypeError:
+        return
+    borders = range(1,MAX_TURN+1)
+    if take not in borders:
+        await update.message.reply_text(
+            f"between {str(min(borders))} and {str(MAX_TURN)} expected!")
+        return
+    sessions[update.effective_user.id] -= take
+    prompt = f'{str(sessions[update.effective_user.id])} left!' if\
+        sessions[update.effective_user.id] > 0 else\
+            "You took all of 'em!"
+    await update.message.reply_text(prompt)
+    if sessions[update.effective_user.id] <= 0:
+        await update.message.reply_text(f"{RESULT[True]}")
+    else :
         
-       update.message.reply_text("send your content")
+        if sessions[update.effective_user.id] > 0:
+            await move_bot(update_=update,context=context,killer=False)
+    

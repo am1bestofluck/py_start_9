@@ -1,18 +1,19 @@
 
 
-
+import re
 import sys
 
+
 import telegram
+if telegram.__version__ !='20.0':
+    print('pip install python-telegram-bot --upgrade')
+    sys.exit
 
 try:
     from telegram import Update
-    from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+    from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes,\
+        MessageHandler, filters, Updater
 except ImportError:
-    print('pip install python-telegram-bot --upgrade')
-    sys.exit()
-
-if telegram.__version__ !='20.0':
     print('pip install python-telegram-bot --upgrade')
     sys.exit()
 
@@ -23,11 +24,15 @@ except ImportError:
     sys.exit()
 
 from backend import reset, rules, help_, move, notation
+from constants import MAX_TURN
+
+
 
 app = ApplicationBuilder().token(BOT_KEY).build()
-
 app.add_handler(CommandHandler("start", notation))
 app.add_handler(CommandHandler("reset", reset))
 app.add_handler(CommandHandler("rules", rules))
-app.add_handler(CommandHandler("take",move))
+for i in range(MAX_TURN+1):
+    app.add_handler(CommandHandler(f"take{str(i)}",move))
 app.run_polling()
+
